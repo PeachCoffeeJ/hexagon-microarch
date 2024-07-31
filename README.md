@@ -30,4 +30,4 @@ wrong_exe_path.cmd
 We use Xiaomi 12 featuring Qualcomm Snapdragon 8 Gen 1 to test the microarchitectural attacks on the Hexagon DSP. We set up our Hexagon SDK environment on Windows 11.
 
 ## Status
-This project is the part of my master thesis and currently it is under active research and development.
+This project is the part of my master thesis and currently it is still under research and development.
