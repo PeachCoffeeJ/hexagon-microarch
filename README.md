@@ -6,18 +6,20 @@ Microarch folder contains the code to generate the modules running on the Hexago
 
 ## Usage
 Connect the rooted mobile device, set up the Hexagon SDK environment and run the following scripts:
-    # Build and push the DSP modules into the mobile device.
-    build&push.cmd
-    # Capture the DSP log messages and save to the log.txt file.
-    save_dsp_log.cmd
-    # Use Flush+Reload method to measure the access time of the DSP cache.
-    flush_reload.cmd
-    # Draw the cache access time distribution figure.
-    fig_plot.cmd
-    # Capture the DSP log messages in the terminal.
-    dsp_log.cmd
-    # Test the wrong xexecution path issue in the DSP.
-    wrong_exe_path.cmd
+```
+# Build and push the DSP modules into the mobile device.
+build&push.cmd
+# Capture the DSP log messages and save to the log.txt file.
+save_dsp_log.cmd
+# Use Flush+Reload method to measure the access time of the DSP cache.
+flush_reload.cmd
+# Draw the cache access time distribution figure.
+fig_plot.cmd
+# Capture the DSP log messages in the terminal.
+dsp_log.cmd
+# Test the wrong execution path issue in the DSP.
+wrong_exe_path.cmd
+```
 
 ## Environment
 We use Xiaomi 12 featuring Qualcomm Snapdragon 8 Gen 1 to test the microarchitectural attacks on the Hexagon DSP. We set up our Hexagon SDK environment on Windows 11.
