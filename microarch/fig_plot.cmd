@@ -1,0 +1,1 @@
+python3 plotter.py < log.txt

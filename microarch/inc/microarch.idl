@@ -19,6 +19,7 @@ const string IDL_VERSION = "1.2.3";
 interface microarch : remote_handle64 {
    long fltest(in sequence<long> vec, rout long long res);
    long spectest(in sequence<long> vec, rout long long res);
+   long exe_path(in sequence<long> vec, rout long long res);
    // long max(in sequence<long> vec, rout long res);
 };
 

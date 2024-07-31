@@ -28,6 +28,10 @@ static void print_usage()
     "    1: Run locally on APPS.\n"
     "    0: Run on DSP.\n"
     "        Default Value: 1\n"
+    "-F funtion: choose which funtion to run:\n"
+    "    1: microarch_exe_path.\n"
+    "    0: microarch_fltest.\n"
+    "        Default Value: 1\n"
     "-q multisession_test: Test to create multiple sessions parallely calculating sums for predetermined arrays\n"
     "    0: Does not run the multisession tests\n"
     "    1: Run the multisession tests\n"
@@ -44,11 +48,12 @@ int main(int argc, char* argv[])
   int num = 1;
   int domain_id = -1;
   int unsignedpd_flag = 1;
+  int select_function = 1;
   bool is_unsignedpd_enabled = false;
   bool multisession_test = false;
   int option = 0;
 
-  while ((option = getopt(argc, argv,"d:U:q:r:n:")) != -1) {
+  while ((option = getopt(argc, argv,"d:U:q:r:n:F:")) != -1) {
     switch (option) {
       case 'd' : domain_id = atoi(optarg);
         break;
@@ -59,6 +64,8 @@ int main(int argc, char* argv[])
       case 'r' : runLocal = atoi(optarg);
         break;
       case 'n' : num = atoi(optarg);
+        break;
+      case 'F' : select_function = atoi(optarg);
         break;
       default:
         print_usage();
@@ -127,7 +134,7 @@ starttest:
       printf("ERROR 0x%x: microarch test failed\n\n", nErr);
     }
   } else {
-    nErr = microarch_test(runLocal, domain_id, num, is_unsignedpd_enabled);
+    nErr = microarch_test(runLocal, domain_id, num, is_unsignedpd_enabled, select_function);
     if (nErr) {
       printf("ERROR 0x%x: microarch test failed\n\n", nErr);
     }

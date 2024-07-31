@@ -21,9 +21,9 @@ CALC_EXPORT int main(void)
 
    /* For Simulator DSP domain does not matter so any dummy value should work.
     * Here ADSP_DOMAIN_ID is being used. */
-   VERIFY(0 == (nErr = microarch_test(0, ADSP_DOMAIN_ID, 256, 0)));
+   VERIFY(0 == (nErr = microarch_test(0, ADSP_DOMAIN_ID, 256, 0, 1)));
    nPass++;
-   VERIFY(0 == (nErr = microarch_test(1, 0, 256, 0)));
+   VERIFY(0 == (nErr = microarch_test(1, 0, 256, 0, 1)));
    nPass++;
 
 bail:

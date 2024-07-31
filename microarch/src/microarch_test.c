@@ -65,7 +65,7 @@ int local_microarch_max(const int* vec, int vecLen, int *res) {
   return 0;
 }
 
-int microarch_test(int runLocal, int domain_id, int num, bool is_unsignedpd_enabled) {
+int microarch_test(int runLocal, int domain_id, int num, bool is_unsignedpd_enabled, int select_function) {
   int nErr = AEE_SUCCESS;
   int* test = NULL;
   int ii, len = 0, resultMax = 0;
@@ -159,12 +159,18 @@ int microarch_test(int runLocal, int domain_id, int num, bool is_unsignedpd_enab
 
     do {
       if (AEE_SUCCESS == (nErr = microarch_open(microarch_URI_domain, &handleSum))) {
-        printf("\nCall microarch_spectest on the DSP\n");
-        nErr = microarch_spectest(handleSum, test, num, &result);
+        if (select_function == 1) {
+          printf("\nCall microarch_exe_path on the DSP\n");
+          nErr = microarch_exe_path(handleSum, test, num, &result);
+        }
+        else {
+          printf("\nCall microarch_fltest on the DSP\n");
+          nErr = microarch_fltest(handleSum, test, num, &result);
+        }
       }
 
       if (!nErr) {
-        printf("Sum pointer = 0x%llx\n", result);
+        // printf("Sum pointer = 0x%llx\n", result);
         break;
       } else {
         if (nErr == AEE_ECONNRESET && errno == ECONNRESET) {

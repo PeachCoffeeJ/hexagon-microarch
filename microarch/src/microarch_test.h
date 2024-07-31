@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-int microarch_test(int runMode, int domain, int num, bool isUnsignedPD_Enabled);
+int microarch_test(int runMode, int domain, int num, bool isUnsignedPD_Enabled, int select_function);
 
 /**
 * Method to test multiple sessions on a single domain.

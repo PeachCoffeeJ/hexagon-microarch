@@ -134,10 +134,10 @@ static inline __attribute__((always_inline)) uint32_t conditional_branch_test(un
     // "r3 = memub(r0)\n"
     "}\n"
     "%0 = #0\n"
-    "jump EXIT\n"
+    "jump KEXIT\n"
     "KTEST:\n"
     "%0 = #1\n"
-    "EXIT:\n"
+    "KEXIT:\n"
     :"=r" (flag)
     :"r"(reloadbuffer), "r"(target_offset), "r"(offset) : "r0", "r1", "r2", "r3", "r4", "r5"
     );
@@ -181,7 +181,7 @@ static inline __attribute__((always_inline)) uint8_t exe_path_test(unsigned char
     "r3 = %4\n"
     // "r5 = #0\n"
     "{\n"
-    "r4 = asl(r2,#23)\n"
+    "r4 = asl(r2,#24)\n"
     "P0 = cmp.gtu(r3,r4)\n"
     // "if (!P0.new) r5 = memub(%1)\n"
     "if (P0.new) jump:t TAKEN\n"
@@ -192,10 +192,10 @@ static inline __attribute__((always_inline)) uint8_t exe_path_test(unsigned char
 
     "TAKEN:\n"
     // "{\n"
-    "r5 = memub(%2)\n"
-    "r6 = add(%1,mpyi(#128,r5))\n"
-    "r7 = memub(r6)\n"
-    "%0 = #1\n"
+    // "r5 = memub(%2)\n"
+    // "r6 = add(%1,mpyi(#128,r5))\n"
+    // "r7 = memub(r6)\n"
+    "%0 = #0xff\n"
     "jump EXIT\n"
     // "}\n"
 
