@@ -1,0 +1,27 @@
+# binary names
+DLL_NAME=libmicroarch
+EXE_NAME=microarch
+
+UTILS_DIR=$(HEXAGON_SDK_ROOT)/utils/examples
+
+# stub library
+BUILD_DLLS += $(DLL_NAME)
+$(DLL_NAME)_QAICIDLS += inc/microarch
+$(DLL_NAME)_C_SRCS += $(OBJ_DIR)/microarch_stub
+$(DLL_NAME)_DLLS += $(LIB_DSPRPC)
+
+# stand-alone executable
+BUILD_EXES += $(EXE_NAME)
+$(EXE_NAME)_QAICIDLS += inc/microarch
+$(EXE_NAME)_C_SRCS += src/microarch_main src/microarch_test \
+                      $(UTILS_DIR)/dsp_capabilities_utils \
+                      $(UTILS_DIR)/pd_status_notification
+$(EXE_NAME)_DLLS += $(DLL_NAME) $(LIB_DSPRPC)
+$(EXE_NAME)_DEFINES += VERIFY_PRINT_ERROR
+
+# copy final build products to the ship directory
+BUILD_COPIES = \
+   $(DLLS) \
+   $(EXES) \
+   $(LIBS) \
+   $(SHIP_DIR)/ ;

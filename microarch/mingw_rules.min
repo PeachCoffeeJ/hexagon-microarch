@@ -1,0 +1,18 @@
+# binary names
+TEST_EXE_NAME=microarch_test
+
+# test library executed using TISE
+BUILD_DLLS += $(TEST_EXE_NAME)
+$(TEST_EXE_NAME)_QAICIDLS += inc/microarch
+$(TEST_EXE_NAME)_C_SRCS += $(OBJ_DIR)/microarch_stub
+$(TEST_EXE_NAME)_C_SRCS += src/microarch_test_main src/microarch_test
+$(TEST_EXE_NAME)_LIBS += rpcmem libptlremote
+$(TEST_EXE_NAME)_main_DEFINES += CALC_EXPORT=__declspec\(dllexport\) 
+
+DEFINES+=WIN32
+# copy final build products to the ship directory
+BUILD_COPIES += \
+   $(DLLS) \
+   $(EXES) \
+   $(LIBS) \
+   $(SHIP_DIR)/ ;

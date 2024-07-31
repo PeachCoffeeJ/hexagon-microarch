@@ -1,0 +1,33 @@
+#Set NO_QURT_INC to 1 to disable qurt libraries/headers inclusion
+NO_QURT_INC = 1
+
+UTILS_DIR=$(HEXAGON_SDK_ROOT)/utils/examples
+
+# This builds the skel library
+BUILD_LIBS += libmicroarch_skel
+
+# This builds the dynamic library
+BUILD_DLLS += libmicroarch_skel
+
+libmicroarch_skel_QAICIDLS += inc/microarch
+libmicroarch_skel_C_SRCS += $(OBJ_DIR)/microarch_skel
+libmicroarch_skel.C_SRCS += src/microarch_imp.c src/version.c
+
+# quality test
+BUILD_QEXES += microarch_q
+
+microarch_q_C_SRCS += src/microarch_test_main src/microarch_test \
+                       $(UTILS_DIR)/dsp_capabilities_utils \
+                       $(UTILS_DIR)/pd_status_notification
+microarch_q_LIBS += rpcmem libmicroarch_skel
+
+#run_main_on_hexagon already has rtld, test_util and atomic linked into it
+ifeq (1,$(NO_QURT_INC))
+microarch_q_LIBS += rtld test_util atomic
+endif
+# copy final build products to the ship directory
+BUILD_COPIES += \
+   $(DLLS) \
+   $(EXES) \
+   $(LIBS) \
+   $(SHIP_DIR)/ ;

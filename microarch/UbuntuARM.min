@@ -1,0 +1,6 @@
+LIB_DSPRPC = libadsprpc
+
+include cpu.min
+
+$(EXE_NAME)_LIBS += rpcmem
+$(EXE_NAME)_LD_FLAGS += -ldl
